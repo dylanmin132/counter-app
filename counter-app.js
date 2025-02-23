@@ -5,6 +5,7 @@
 import { LitElement, html, css } from "lit";
 import { DDDSuper } from "@haxtheweb/d-d-d/d-d-d.js";
 import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
+import "@haxtheweb/multiple-choice/lib/confetti-container.js"
 
 /**
  * `counter-app`
@@ -12,6 +13,8 @@ import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
  * @demo index.html
  * @element counter-app
  */
+
+
 export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
 
   static get tag() {
@@ -20,6 +23,10 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
 
   constructor() {
     super();
+    this.count = 0;
+    this.min = 10;
+    this.max = 25;
+
     this.title = "";
     this.t = this.t || {};
     this.t = {
@@ -39,7 +46,9 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
   static get properties() {
     return {
       ...super.properties,
-      title: { type: String },
+      count: { type: Number, reflect: true },
+      min: {type: Number},
+      max: {type: Number}
     };
   }
 
@@ -53,12 +62,24 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
         background-color: var(--ddd-theme-accent);
         font-family: var(--ddd-font-navigation);
       }
+      :host([count="10"]) {
+        color: var(--ddd-theme-default-landgrantBrown);
+      }
+      :host([count="18"]) {
+        color: var(--ddd-theme-default-athertonViolet);
+      }
+      :host([count="21"]) {
+        color: var(--ddd-theme-default-opportunityGreen);
+      }
+      :host([count="25"]) {
+        color: var(--ddd-theme-default-keystoneYellow);
+      }
       .wrapper {
         margin: var(--ddd-spacing-2);
         padding: var(--ddd-spacing-4);
       }
-      h3 span {
-        font-size: var(--counter-app-label-font-size, var(--ddd-font-size-s));
+      .counter {
+        font-size: var(--counter-app-label-font-size, var(--ddd-font-size-xxl));
       }
     `];
   }
@@ -66,15 +87,49 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
   // Lit render the HTML
   render() {
     return html`
-<div class="wrapper">
-  <h3><span>${this.t.title}:</span> ${this.title}</h3>
-  <slot></slot>
-</div>`;
+    <confetti-container id="confetti"></confetti-container>
+      <div class="wrapper">
+      <div class = "counter">${this.count}</div>
+      <div class = "buttons">
+          <button ?disabled="${this.count === this.min}" @click="${this.decrease}">-1</button>
+          <button ?disabled="${this.count === this.max}" @click="${this.increase}">+1</button>
+        </div>
+      </div>
+    `;
   }
 
-  /**
-   * haxProperties integration via file reference
-   */
+  increase() {
+    if(this.count < 25) {
+      this.count++;
+    }
+  }
+  decrease() {
+    if(this.count > 10) {
+      this.count--;
+    }
+  }
+
+  updated(changedProperties) {
+    if(super.updated) {
+      super.updated(changedProperties);
+    }
+    if(changedProperties.has('count')) {
+      if(this.count === this.max) {
+        this.makeItRain();
+      }
+    }
+  }
+
+  makeItRain() {
+    import("@haxtheweb/multiple-choice/lib/confetti-container.js").then(
+      (module) => {
+        setTimeout(() => {
+          this.shadowRoot.querySelector("#confetti").setAttribute("popped", "");
+        }, 0);
+      }
+    );
+  }
+  
   static get haxProperties() {
     return new URL(`./lib/${this.tag}.haxProperties.json`, import.meta.url)
       .href;
