@@ -87,7 +87,7 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
   // Lit render the HTML
   render() {
     return html`
-    <confetti-container id="confetti"></confetti-container>
+    <confetti-container id="confetti">
       <div class="wrapper">
       <div class = "counter">${this.count}</div>
       <div class = "buttons">
@@ -95,6 +95,7 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
           <button ?disabled="${this.count === this.max}" @click="${this.increase}">+1</button>
         </div>
       </div>
+    </confetti-container>
     `;
   }
 
@@ -114,7 +115,7 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
       super.updated(changedProperties);
     }
     if(changedProperties.has('count')) {
-      if(this.count === this.max) {
+      if(this.count ===21) {
         this.makeItRain();
       }
     }
